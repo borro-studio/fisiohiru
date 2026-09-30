@@ -47,6 +47,15 @@
     pick();
   }
 
+  // mapa: se carga solo si el usuario lo pide (sin cookies de terceros por defecto)
+  const ml = document.getElementById('mapLoad');
+  if (ml) ml.addEventListener('click', () => {
+    const f = document.createElement('iframe');
+    f.title = 'Mapa'; f.loading = 'lazy'; f.referrerPolicy = 'no-referrer-when-downgrade';
+    f.src = 'https://www.google.com/maps?q=Plazaola+kalea+4,+20230+Legazpi&output=embed';
+    document.getElementById('map').replaceChildren(f);
+  });
+
   // reveal
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: .15, rootMargin: '0px 0px -40px 0px' });
   document.querySelectorAll('.rv').forEach(el => io.observe(el));

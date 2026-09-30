@@ -3,6 +3,7 @@ Uso: python3 build/build.py  (desde la carpeta fisiohiru)
 """
 import html, os
 from content import PAGES
+from content_legal import LEGAL, DATA, UPDATED
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "web")
 
@@ -25,11 +26,9 @@ HEAD = """<!doctype html>
 <meta name="description" content="{desc}">
 <link rel="icon" href="assets/logo.png">
 <script>(()=>{{const r=document.documentElement,q=new URLSearchParams(location.search),t=q.get("theme");if(t)r.dataset.theme=t;if(!q.has("static"))r.classList.add("js");try{{const l=localStorage.getItem("hiru-lang");if(l)r.lang=l}}catch(e){{}}}})()</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
-<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<link rel="preload" href="assets/fonts/bricolage-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/icons.css">
 <link rel="stylesheet" href="assets/styles.css">
 <link rel="preload" as="image" href="assets/{img}">
 </head>
@@ -62,9 +61,9 @@ FOOT = """<footer>
   <div class="wrap">
     <a href="index.html"><img class="foot-logo" src="assets/logo.png" alt="Hiru Fisioterapia"></a>
     <nav>
-      <a href="#"><span lang="eu">Pribatutasun politika</span><span lang="es">Política de privacidad</span></a>
-      <a href="#">Cookies</a>
-      <a href="#"><span lang="eu">Lege oharra</span><span lang="es">Aviso legal</span></a>
+      <a href="lege-oharra.html"><span lang="eu">Lege oharra</span><span lang="es">Aviso legal</span></a>
+      <a href="pribatutasun-politika.html"><span lang="eu">Pribatutasun politika</span><span lang="es">Política de privacidad</span></a>
+      <a href="cookie-politika.html"><span lang="eu">Cookie politika</span><span lang="es">Política de cookies</span></a>
     </nav>
     <span>© 2026 Hiru Fisioterapia</span>
   </div>
@@ -164,4 +163,60 @@ def page(p):
 for p in PAGES:
     with open(os.path.join(OUT, p["file"]), "w") as f:
         f.write(page(p))
+    print("ok", p["file"])
+
+def fill(txt):
+    """Sustituye {TITULAR}/{NIF}; si faltan, los marca como pendientes."""
+    for k, v in DATA.items():
+        txt = txt.replace("{%s}" % k, html.escape(v) if v else f'<mark class="todo">[{k.lower()}]</mark>')
+    return txt
+
+
+def legal_page(p):
+    nav = NAV.replace(' aria-current="page"', "")
+    toc = "".join(f'<li><a href="#{s["id"]}">{t(s["title"])}</a></li>' for s in p["sections"])
+    secs = []
+    for s in p["sections"]:
+        out = [f'<article class="svc-sec legal-sec" id="{s["id"]}"><h2>{t(s["title"])}</h2>']
+        for kind, val in s["blocks"]:
+            if kind == "p":
+                out.append(f"<p>{fill(t(val))}</p>")
+            else:
+                out.append('<ul class="legal-list">' + "".join(f"<li>{fill(t(x))}</li>" for x in val) + "</ul>")
+        out.append("</article>")
+        secs.append("".join(out))
+    body = f"""<main>
+  <section class="page-hero legal-hero">
+    <div class="wrap">
+      <div>
+        <nav class="crumbs" aria-label="breadcrumb">
+          <a href="index.html"><span lang="eu">Hasiera</span><span lang="es">Inicio</span></a><i class="ph ph-caret-right"></i>
+          <span>{t(p["title"])}</span>
+        </nav>
+        <h1>{t(p["title"])}</h1>
+        <p class="lead">{t(p["lead"])}</p>
+        <p class="updated"><span lang="eu">Azken eguneraketa:</span><span lang="es">Última actualización:</span> {t(UPDATED)}</p>
+      </div>
+    </div>
+  </section>
+  <section class="svc-page">
+    <div class="wrap">
+      <aside class="toc">
+        <p class="toc-title"><span lang="eu">Edukia</span><span lang="es">Contenido</span></p>
+        <ul>{toc}</ul>
+      </aside>
+      <div class="svc-sections legal-body">
+{chr(10).join(secs)}
+      </div>
+    </div>
+  </section>
+</main>
+"""
+    head = HEAD.format(title=p["title"][0], desc=html.escape(p["lead"][1]), img="logo.png").replace('<link rel="preload" as="image" href="assets/logo.png">\n', "")
+    return head + nav + body + FOOT
+
+
+for p in LEGAL:
+    with open(os.path.join(OUT, p["file"]), "w") as f:
+        f.write(legal_page(p))
     print("ok", p["file"])
