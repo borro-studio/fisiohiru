@@ -35,6 +35,7 @@ h1,h2,h3{font-family:var(--display);font-weight:600;letter-spacing:-.025em;line-
 h2{font-size:clamp(2rem,4.2vw,3.25rem)}
 h3{font-size:1.35rem;letter-spacing:-.015em;line-height:1.2}
 p{color:var(--ink-2)}
+[lang="eu"] > .hl{white-space:nowrap}
 .hl{background:linear-gradient(transparent 60%,var(--accent) 60%,var(--accent) 90%,transparent 90%);padding:0 .08em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hl{background:none;color:var(--accent)}}
 :root[data-theme="dark"] .hl{background:none;color:var(--accent)}
@@ -220,13 +221,16 @@ footer a:hover{color:var(--ink)}
   .svc-body .inner{padding-left:0}
 }
 @media (max-width:767px){
+  .hero h1{font-size:clamp(2.1rem,10.4vw,2.6rem)}
   .wrap{padding:0 16px}
   body{font-size:16px}
   .nav .btn{display:none}
   .facts{grid-template-columns:1fr}
   .fact + .fact{padding-left:0;border-left:0;border-top:1px solid var(--line)}
   .fact{padding:22px 0}
-  .rail{grid-template-columns:1fr 1fr;gap:12px}
+  .rail{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .class-card h3{font-size:1.1rem;overflow-wrap:anywhere}
+  .classes .top .note{white-space:normal;border-radius:var(--radius-sm)}
   .equip{grid-template-columns:1fr}
   .space-panel,.contact-info{padding:28px}
   .people li{grid-template-columns:1fr}
