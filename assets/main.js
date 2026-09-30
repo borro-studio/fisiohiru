@@ -51,8 +51,8 @@
   const ml = document.getElementById('mapLoad');
   if (ml) ml.addEventListener('click', () => {
     const f = document.createElement('iframe');
-    f.title = 'Mapa'; f.loading = 'lazy'; f.referrerPolicy = 'no-referrer-when-downgrade';
-    f.src = 'https://www.google.com/maps?q=Plazaola+kalea+4,+20230+Legazpi&output=embed';
+    f.title = 'Mapa'; f.referrerPolicy = 'no-referrer-when-downgrade';
+    f.src = 'https://www.google.com/maps/embed?origin=mfe&pb=!1m2!2m1!1sPlazaola+kalea+4,+20230+Legazpi';
     document.getElementById('map').replaceChildren(f);
   });
 
